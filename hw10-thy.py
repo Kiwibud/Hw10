@@ -34,6 +34,7 @@ your perfect car based on your criteria.
 """
 
 import pandas as pd
+import re
 
 
 def q1(df):
@@ -72,17 +73,17 @@ def q4(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string
     """
-    return df.loc[df['Hwy FE (Guide) - Conventional Fuel'].idxmax(), 'Carline']
+    return df['Hwy FE (Guide) - Conventional Fuel'].idxmax()
 
 
 def q5(df):
     """
     What is the average combined FE - Conventional Fuel among all wheel drives.
-    Use 'Drive Desc'.
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: float
     """
-    pass
+    return df.loc[df['Drive Desc'] == 'All Wheel Drive',
+                  'Comb FE (Guide) - Conventional Fuel'].mean()
 
 
 def q6(df):
@@ -92,7 +93,8 @@ def q6(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string
     """
-    pass
+    return abs(df['Hwy FE (Guide) - Conventional Fuel'] -
+               df['City FE (Guide) - Conventional Fuel']).idxmax()
 
 
 def q7(df):
@@ -100,10 +102,12 @@ def q7(df):
     What is the average annual fuel cost (Annual Fuel1 Cost-Conventional Fuel)
     of supercharged cars?  Use the "Air Aspiration Method Desc" to identify
     supercharged cars.
+    'Annual Fuel1 Cost - Conventional Fuel'| Supercharged
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: float
     """
-    pass
+    return df.loc[df['Air Aspiration Method Desc'] == 'Supercharged',
+                  'Annual Fuel1 Cost - Conventional Fuel'].mean()
 
 
 def q8(df):
@@ -113,7 +117,8 @@ def q8(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string - carline
     """
-    pass
+    return df.loc[df['Carline Class Desc'].str.contains(r'\bSUV\b', na=False),
+                  'Annual Fuel1 Cost - Conventional Fuel'].idxmax()
 
 
 def q9(df):
@@ -122,7 +127,8 @@ def q9(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string
     """
-    pass
+    manual_df = df[df['Trans Desc'] == 'Manual']
+    return manual_df.groupby('Mfr Name')['Trans Desc'].count().idxmax()
 
 
 def q10(df):
@@ -131,7 +137,8 @@ def q10(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: Pandas series
     """
-    pass
+    return df.groupby('Division')['Annual Fuel1 Cost - Conventional Fuel']\
+        .mean()
 
 
 def q11(df):
@@ -145,29 +152,22 @@ def q11(df):
 
 
 def main():
-    df = pd.read_csv('2019 FE Guide.csv')
+    # set the index to column 3: Carline
+    df = pd.read_csv('2019 FE Guide.csv', index_col=3)
     # print(df.head())
     # print(f'Total rows in the data frame: {len(df)}')
-    print(f'Q1: Number of cars are made by the division Acura: {q1(df)}')
-    print(f'Q2: Number of Guzzlers made by the manufacturer General Motors: '
-          f'{q2(df)}')
-    print(f'Q3: The value of the lowest combined Fuel Efficiency is {q3(df)}')
-    print(f'Q4: The car line has the highest Highway FE - Conventional Fuel is'
-          f'{q4(df)}')
+    print(f'Q1: {q1(df)}')
+    print(f'Q2: {q2(df)}')
+    print(f'Q3: {q3(df)}')
+    print(f'Q4: {q4(df)}')
     print(f'Q5: {q5(df)}')
     print(f'Q6: {q6(df)}')
     print(f'Q7: {q7(df)}')
     print(f'Q8: {q8(df)}')
     print(f'Q9: {q9(df)}')
-    print(f'Q10: {q10(df)}')
+    print(f'Q10:\n{q10(df)}')
     print(f'Q11: {q11(df)}')
 
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
