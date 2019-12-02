@@ -137,25 +137,28 @@ def q10(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: Pandas series
     """
-    return df.groupby('Division')['Annual Fuel1 Cost - Conventional Fuel']\
+    return df.groupby('Division')['Annual Fuel1 Cost - Conventional Fuel'] \
         .mean()
 
 
-def q11(df):
+def q11_thy(df):
     """
-    What criteria would you use to buy a car?  Write a function that
-    returns your perfect car based on your criteria.
+    Write a function that returns your perfect car based on your criteria:
+    Made by Toyota, automatic, not require a specific type of gasoline,
+    Annual Fuel Cost less than 3000
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string - carline
     """
-    pass
+    criteria = df[(df['Mfr Name'] == 'Toyota')
+                  & (df['Trans Desc'] == 'Automatic')
+                  & (df['Fuel Usage Desc - Conventional Fuel'].str.contains
+                     ('Recommended'))
+                  & (df['Annual Fuel1 Cost - Conventional Fuel'] < 3000)]
+    return criteria['Annual Fuel1 Cost - Conventional Fuel'].idxmin()
 
 
 def main():
-    # set the index to column 3: Carline
-    df = pd.read_csv('2019 FE Guide.csv', index_col=3)
-    # print(df.head())
-    # print(f'Total rows in the data frame: {len(df)}')
+    df = pd.read_csv('2019 FE Guide.csv', index_col=2, usecols=range(1, 70))
     print(f'Q1: {q1(df)}')
     print(f'Q2: {q2(df)}')
     print(f'Q3: {q3(df)}')
@@ -166,7 +169,7 @@ def main():
     print(f'Q8: {q8(df)}')
     print(f'Q9: {q9(df)}')
     print(f'Q10:\n{q10(df)}')
-    print(f'Q11: {q11(df)}')
+    print(f'Q11_Thy: {q11_thy(df)}')
 
 
 if __name__ == '__main__':
