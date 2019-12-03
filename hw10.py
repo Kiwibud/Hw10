@@ -34,6 +34,7 @@ your perfect car based on your criteria.
 """
 
 import pandas as pd
+import re
 
 
 def q1(df):
@@ -42,7 +43,7 @@ def q1(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: integer - number of cars made by the division Acura
     """
-    pass
+    return len(df[df['Division'] == 'Acura'])
 
 
 def q2(df):
@@ -51,7 +52,8 @@ def q2(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: integer - number of 'Guzzlers' made by General Motors
     """
-    pass
+    return len(df[(df['Guzzler?'] == 'G') &
+                  (df['Mfr Name'] == 'General Motors')])
 
 
 def q3(df):
@@ -61,7 +63,7 @@ def q3(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: float
     """
-    pass
+    return df['Comb FE (Guide) - Conventional Fuel'].min()
 
 
 def q4(df):
@@ -71,17 +73,17 @@ def q4(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string
     """
-    pass
+    return df['Hwy FE (Guide) - Conventional Fuel'].idxmax()
 
 
 def q5(df):
     """
     What is the average combined FE - Conventional Fuel among all wheel drives.
-    Use 'Drive Desc'.
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: float
     """
-    pass
+    return df.loc[df['Drive Desc'] == 'All Wheel Drive',
+                  'Comb FE (Guide) - Conventional Fuel'].mean()
 
 
 def q6(df):
@@ -91,7 +93,8 @@ def q6(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string
     """
-    pass
+    return abs(df['Hwy FE (Guide) - Conventional Fuel'] -
+               df['City FE (Guide) - Conventional Fuel']).idxmax()
 
 
 def q7(df):
@@ -99,10 +102,12 @@ def q7(df):
     What is the average annual fuel cost (Annual Fuel1 Cost-Conventional Fuel)
     of supercharged cars?  Use the "Air Aspiration Method Desc" to identify
     supercharged cars.
+    'Annual Fuel1 Cost - Conventional Fuel'| Supercharged
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: float
     """
-    pass
+    return df.loc[df['Air Aspiration Method Desc'] == 'Supercharged',
+                  'Annual Fuel1 Cost - Conventional Fuel'].mean()
 
 
 def q8(df):
@@ -112,7 +117,8 @@ def q8(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string - carline
     """
-    pass
+    return df.loc[df['Carline Class Desc'].str.contains(r'\bSUV\b', na=False),
+                  'Annual Fuel1 Cost - Conventional Fuel'].idxmax()
 
 
 def q9(df):
@@ -121,7 +127,8 @@ def q9(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string
     """
-    pass
+    manual_df = df[df['Trans Desc'] == 'Manual']
+    return manual_df.groupby('Mfr Name')['Trans Desc'].count().idxmax()
 
 
 def q10(df):
@@ -130,22 +137,41 @@ def q10(df):
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: Pandas series
     """
-    pass
+    return df.groupby('Division')['Annual Fuel1 Cost - Conventional Fuel'] \
+        .mean()
 
 
-def q11(df):
+def q11_thy(df):
     """
-    What criteria would you use to buy a car?  Write a function that
-    returns your perfect car based on your criteria.
+    Write a function that returns your perfect car based on your criteria:
+    Made by Toyota, automatic, not require a specific type of gasoline,
+    Annual Fuel Cost is cheapest and less than 3000
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string - carline
     """
-    pass
+    criteria = df[(df['Mfr Name'] == 'Toyota')
+                  & (df['Trans Desc'] == 'Automatic')
+                  & (df['Fuel Usage Desc - Conventional Fuel'].str.contains
+                     ('Recommended'))
+                  & (df['Annual Fuel1 Cost - Conventional Fuel'] < 3000)]
+    return criteria['Annual Fuel1 Cost - Conventional Fuel'].idxmin()
+
+def q11_grace(df):
+    """
+    Write a function that returns your perfect car based on your criteria:
+    All wheel drive, not Two Seaters, Transmission is Auto, and has highest
+    HWY FE (Guide) - Conventional Fuel
+    :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
+    :return: string - carline
+    """
+    goal = df.loc[(df['Drive Desc'] == 'All Wheel Drive') & (df['Carline '
+            'Class Desc'] != 'Two Seaters') & (df['Transmission'].str.contains(
+        r'\bAuto\b', flags=re.IGNORECASE, na=False))]
+    return goal['Hwy FE (Guide) - Conventional Fuel'].idxmax()
 
 
 def main():
-    df = pd.read_csv('2019 FE Guide.csv')
-    print(df.head())
+    df = pd.read_csv('2019 FE Guide.csv', index_col=2, usecols=range(1, 70))
     print(f'Q1: {q1(df)}')
     print(f'Q2: {q2(df)}')
     print(f'Q3: {q3(df)}')
@@ -155,15 +181,9 @@ def main():
     print(f'Q7: {q7(df)}')
     print(f'Q8: {q8(df)}')
     print(f'Q9: {q9(df)}')
-    print(f'Q10: {q10(df)}')
-    print(f'Q11: {q11(df)}')
-
+    print(f'Q10:\n{q10(df)}')
+    print(f'Q11_Thy: {q11_thy(df)}')
+    print(f'Q11_Grace: {q11_grace(df)}')
 
 if __name__ == '__main__':
     main()
-
-
-
-
-
-
