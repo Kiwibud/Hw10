@@ -145,7 +145,7 @@ def q11_thy(df):
     """
     Write a function that returns your perfect car based on your criteria:
     Made by Toyota, automatic, not require a specific type of gasoline,
-    Annual Fuel Cost less than 3000
+    Annual Fuel Cost is cheapest and less than 3000
     :param df: Pandas DataFrame represents the data in 2019 FE Guide.csv
     :return: string - carline
     """
